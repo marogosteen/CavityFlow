@@ -13,8 +13,17 @@ func NewPressCV(csize int, rsize int, initPress float64) (cv PressCV) {
 	return
 }
 
+// func (cv PressCV) Get(col int, row int) float64 {
+// 	v, b := cv.CVMap[Coodinate{Col: col, Row: row}]
+// 	if !b {
+// 		log.Fatalln("ver velocity CVMap value is nil")
+// 	}
+// 	return v
+// }
+
 func (cv PressCV) Get(col int, row int) float64 {
-	return cv.CVMap[Coodinate{Col: col, Row: row}]
+	v := cv.CVMap[Coodinate{Col: col, Row: row}]
+	return v
 }
 
 func (cv PressCV) BoundaryCondition() {

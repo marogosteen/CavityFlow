@@ -15,8 +15,17 @@ func NewHVeloCV(csize int, rsize int, initVelo float64, mainFlow float64) (cv HV
 	return
 }
 
+// func (cv HVeloCV) Get(col int, row int) float64 {
+// 	v, b := cv.CVMap[Coodinate{Col: col, Row: row}]
+// 	if !b {
+// 		log.Fatalln("ver velocity CVMap value is nil")
+// 	}
+// 	return v
+// }
+
 func (cv HVeloCV) Get(col int, row int) float64 {
-	return cv.CVMap[Coodinate{Col: col, Row: row}]
+	v := cv.CVMap[Coodinate{Col: col, Row: row}]
+	return v
 }
 
 func (cv HVeloCV) BoundaryCondition() {
