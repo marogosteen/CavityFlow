@@ -1,8 +1,15 @@
 package main
 
 /*TODOs
-	Indexを扱って座標を示すのを止める．
+座標をIndexから，XYに変える．
+境界条件
+時間変化しなかったバグとる
+境界条件はシミュレーションが持つべきでは？
+param struct必要かな？
+equations調整（高度情報が上下逆になったので）
+SurroundingVelo
 */
+
 import (
 	"bufio"
 	"fmt"
@@ -13,11 +20,11 @@ import (
 )
 
 const (
-	horCavityGridSize int = 250
-	verCavityGridSize int = 251
+	cavityGridHeight int = 254
+	cavityGridWidth  int = 254
 
 	xl        float64 = 0.02
-	dh        float64 = xl / float64(horCavityGridSize)
+	dh        float64 = xl / float64(cavityGridWidth)
 	dvs       float64 = 1e-6
 	rho       float64 = 1000
 	eps       float64 = 1e-6
@@ -38,12 +45,12 @@ func writeLog(epoch int, sc controller.SimulationController) {
 	bw := bufio.NewWriter(f)
 	bw.WriteString("y,x,u,v,p\n")
 
-	for row := 0; row < 252; row++ {
-		for col := 0; col < 251; col++ {
-			h := (sc.HVeloCV.Get(col, row) + sc.HVeloCV.Get(col+1, row)) / 2
-			v := (sc.VVeloCV.Get(col, row) + sc.VVeloCV.Get(col, row+1)) / 2
-			p := sc.PressCV.Get(col, row)
-			s := fmt.Sprintf("%d,%d,%f,%f,%f\n", row, col, h, v, p)
+	for y := 1; y <= cavityGridHeight; y++ {
+		for x := 1; x <= cavityGridWidth; x++ {
+			u := (sc.HorVeloCV.Get(x, y) + sc.HorVeloCV.Get(x+1, y)) / 2
+			v := (sc.VerVeloCV.Get(x, y) + sc.VerVeloCV.Get(x, y+1)) / 2
+			p := sc.PressCV.Get(x, y)
+			s := fmt.Sprintf("%d,%d,%f,%f,%f\n", y, x, u, v, p)
 			_, err = bw.WriteString(s)
 			if err != nil {
 				panic(err)
@@ -54,31 +61,33 @@ func writeLog(epoch int, sc controller.SimulationController) {
 }
 
 func main() {
-	hVeloCV := volume.NewHVeloCV(horCavityGridSize+1, verCavityGridSize+1, initVelo, mainFlow)
-	vVeloCV := volume.NewVVeloCV(horCavityGridSize+2, verCavityGridSize+1, initVelo)
-	pressCV := volume.NewPressCV(horCavityGridSize+2, verCavityGridSize+2, initPress)
-
-	sc := controller.SimulationController{
-		Dvs:     dvs,
-		Dh:      dh,
-		Rho:     rho,
-		Eps:     eps,
-		HVeloCV: hVeloCV,
-		VVeloCV: vVeloCV,
-		PressCV: pressCV,
-	}
-
 	if _, err := os.Stat(logdir); err != nil {
 		os.Mkdir(logdir, os.ModePerm)
+	}
+
+	horVeloCV := volume.NewVeloCV(cavityGridWidth, cavityGridHeight, initVelo)
+	verVeloCV := volume.NewVeloCV(cavityGridWidth, cavityGridHeight, initVelo)
+	pressCV := volume.NewPressCV(cavityGridWidth, cavityGridHeight, initPress)
+
+	sc := controller.SimulationController{
+		Dvs:       dvs,
+		Dh:        dh,
+		Rho:       rho,
+		Eps:       eps,
+		HorVeloCV: &horVeloCV,
+		VerVeloCV: &verVeloCV,
+		PressCV:   &pressCV,
 	}
 	sc.BoundaryCondition()
 	writeLog(0, sc)
 
 	for epoch := 1; epoch < 5; epoch++ {
-		sc.BoundaryCondition()
 		sc.NextVelocity()
-		phi := sc.Phi(horCavityGridSize, verCavityGridSize)
+
+		phi := sc.Phi(cavityGridWidth, cavityGridHeight)
 		sc.NextPress(phi)
+		sc.BoundaryCondition()
+
 		writeLog(epoch, sc)
 	}
 
