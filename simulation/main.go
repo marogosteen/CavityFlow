@@ -1,19 +1,10 @@
 package main
 
-/*TODOs
-座標をIndexから，XYに変える．
-境界条件
-時間変化しなかったバグとる
-境界条件はシミュレーションが持つべきでは？
-param struct必要かな？
-equations調整（高度情報が上下逆になったので）
-SurroundingVelo
-*/
-
 import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/marogosteen/cavityflow/controller"
 	"github.com/marogosteen/cavityflow/volume"
@@ -25,6 +16,7 @@ const (
 
 	xl        float64 = 0.02
 	dh        float64 = xl / float64(cavityGridWidth)
+	dt        float64 = 0.001
 	dvs       float64 = 1e-6
 	rho       float64 = 1000
 	eps       float64 = 1e-6
@@ -44,9 +36,11 @@ func writeLog(epoch int, sc controller.SimulationController) {
 
 	bw := bufio.NewWriter(f)
 	bw.WriteString("y,x,u,v,p\n")
+	fmt.Println("conplete: " + fp)
 
-	for y := 1; y <= cavityGridHeight; y++ {
-		for x := 1; x <= cavityGridWidth; x++ {
+	// TODO magic number
+	for y := 3; y <= cavityGridHeight-1; y++ {
+		for x := 3; x <= cavityGridWidth-2; x++ {
 			u := (sc.HorVeloCV.Get(x, y) + sc.HorVeloCV.Get(x+1, y)) / 2
 			v := (sc.VerVeloCV.Get(x, y) + sc.VerVeloCV.Get(x, y+1)) / 2
 			p := sc.PressCV.Get(x, y)
@@ -65,15 +59,29 @@ func main() {
 		os.Mkdir(logdir, os.ModePerm)
 	}
 
+	pattern := logdir + "*.csv"
+	files, err := filepath.Glob(pattern)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, f := range files {
+		if err := os.Remove(f); err != nil {
+			panic(err)
+		}
+	}
+
 	horVeloCV := volume.NewVeloCV(cavityGridWidth, cavityGridHeight, initVelo)
 	verVeloCV := volume.NewVeloCV(cavityGridWidth, cavityGridHeight, initVelo)
 	pressCV := volume.NewPressCV(cavityGridWidth, cavityGridHeight, initPress)
 
 	sc := controller.SimulationController{
+		Dt:        dt,
 		Dvs:       dvs,
 		Dh:        dh,
 		Rho:       rho,
 		Eps:       eps,
+		MainFlow:  mainFlow,
 		HorVeloCV: &horVeloCV,
 		VerVeloCV: &verVeloCV,
 		PressCV:   &pressCV,
@@ -81,10 +89,16 @@ func main() {
 	sc.BoundaryCondition()
 	writeLog(0, sc)
 
-	for epoch := 1; epoch < 5; epoch++ {
+	for epoch := 1; epoch < 20; epoch++ {
 		sc.NextVelocity()
+		phi := volume.NewCVMap(cavityGridWidth, cavityGridHeight, 0.0)
+		// TODO magic number これはNextPressとのつながりがあるはず．
+		for y := 3; y <= 252; y++ {
+			for x := 3; x <= 252; x++ {
+				phi[volume.Coodinate{X: x, Y: y}] = sc.Phi(x, y)
+			}
+		}
 
-		phi := sc.Phi(cavityGridWidth, cavityGridHeight)
 		sc.NextPress(phi)
 		sc.BoundaryCondition()
 

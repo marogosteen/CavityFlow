@@ -1,5 +1,7 @@
 package volume
 
+import "fmt"
+
 type PressCV struct {
 	CVMap     map[Coodinate]float64
 	MaxWidth  int
@@ -20,7 +22,9 @@ func NewPressCV(width int, height int, initPress float64) (cv PressCV) {
 func (cv *PressCV) Get(x int, y int) float64 {
 	v, b := cv.CVMap[Coodinate{X: x, Y: y}]
 	if !b {
-		panic("pressure CVMap value is nil")
+		msg := "pressure CVMap value is nil\n"
+		msg += fmt.Sprintf("coodinate x: %d, y: %d", x, y)
+		panic(msg)
 	}
 	return v
 }
