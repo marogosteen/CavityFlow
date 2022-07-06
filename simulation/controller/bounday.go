@@ -23,10 +23,10 @@ func (s *SimulationController) horVeloBoundaryCondition() {
 		s.HorVeloCV.Set(x, bottom+1, v)
 	}
 
-	// 最上2段の流速は主流
+	// 最上段の流速は0，上から二段目は主流
 	top := s.HorVeloCV.MaxHeight
 	for x := 1; x <= s.HorVeloCV.MaxWidth; x++ {
-		s.HorVeloCV.Set(x, top, s.MainFlow)
+		s.HorVeloCV.Set(x, top, 0)
 		s.HorVeloCV.Set(x, top-1, s.MainFlow)
 	}
 }
