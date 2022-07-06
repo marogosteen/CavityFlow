@@ -40,8 +40,7 @@ func (s *SimulationController) NextVelocity() {
 	s.HorVeloCV.CVMap = newHorVeloCVMap
 	s.VerVeloCV.CVMap = newVerVeloCVMap
 	// new cvmapはcavity内の計算のみで，境界条件を適応させていない．
-	s.horVeloBoundaryCondition()
-	s.verVeloBoundaryCondition()
+	s.BoundaryCondition()
 }
 
 func (s *SimulationController) NextPress(phi volume.CVMap) {
@@ -59,7 +58,7 @@ func (s *SimulationController) NextPress(phi volume.CVMap) {
 			}
 		}
 		s.PressCV.CVMap = nextPressCVMap
-		if loss > s.Eps {
+		if loss < s.Eps {
 			fmt.Println(count)
 			break
 		}

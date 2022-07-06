@@ -21,7 +21,7 @@ func (s *SimulationController) horNS(x int, y int) float64 {
 	uat += (v4 - math.Abs(v4)) / 2 * (ou - u) / s.Dh
 
 	pt := (p - lp) / (s.Dh * s.Rho)
-	dt := (ru + lu + uu + ou - 4*u/math.Pow(s.Dh, 2)*s.Dvs)
+	dt := (ru + lu + uu + ou - 4*u)/math.Pow(s.Dh, 2)*s.Dvs
 	newUVelo := u - s.Dt*(uat+pt-dt)
 	return newUVelo
 }
@@ -37,13 +37,13 @@ func (s *SimulationController) verNS(x int, y int) float64 {
 	up := s.PressCV.Get(x, y-1)
 
 	var vat float64 = 0
-	vat += (u4 + math.Abs(u4)) / 2 * (v - uv) / s.Dh
-	vat += (u4 - math.Abs(u4)) / 2 * (ov - v) / s.Dh
-	vat += (v + math.Abs(v)) / 2 * (v - lv) / s.Dh
-	vat += (v - math.Abs(v)) / 2 * (rv - v) / s.Dh
+	vat += (u4 + math.Abs(u4)) / 2 * (v - lv) / s.Dh
+	vat += (u4 - math.Abs(u4)) / 2 * (rv - v) / s.Dh
+	vat += (v + math.Abs(v)) / 2 * (v - uv) / s.Dh
+	vat += (v - math.Abs(v)) / 2 * (ov - v) / s.Dh
 
 	pt := (p - up) / (s.Dh * s.Rho)
-	dt := (rv + lv + uv + ov - 4*v/math.Pow(s.Dh, 2)*s.Dvs)
+	dt := (rv + lv + uv + ov - 4*v)/math.Pow(s.Dh, 2)*s.Dvs
 	newVVelo := v - s.Dt*(vat+pt-dt)
 	return newVVelo
 }
@@ -54,7 +54,7 @@ func (s *SimulationController) Poisson(x int, y int, phi float64) float64 {
 	newP += s.PressCV.Get(x-1, y)
 	newP += s.PressCV.Get(x, y+1)
 	newP += s.PressCV.Get(x, y-1)
-	newP -= phi * s.Dh * s.Dh
+	newP -= phi * math.Pow(s.Dh, 2)
 	newP /= 4
 	return newP
 }
