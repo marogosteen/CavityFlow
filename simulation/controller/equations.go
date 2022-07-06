@@ -14,15 +14,15 @@ func (s *SimulationController) horNS(x int, y int) float64 {
 	p := s.PressCV.Get(x, y)
 	lp := s.PressCV.Get(x-1, y)
 
-	var uat float64 = 0
-	uat += (u + math.Abs(u)) / 2 * (u - lu) / s.Dh
-	uat += (u - math.Abs(u)) / 2 * (ru - u) / s.Dh
-	uat += (v4 + math.Abs(v4)) / 2 * (u - uu) / s.Dh
-	uat += (v4 - math.Abs(v4)) / 2 * (ou - u) / s.Dh
+	var at float64 = 0
+	at += (u + math.Abs(u)) / 2 * (u - lu) / s.Dh
+	at += (u - math.Abs(u)) / 2 * (ru - u) / s.Dh
+	at += (v4 + math.Abs(v4)) / 2 * (u - uu) / s.Dh
+	at += (v4 - math.Abs(v4)) / 2 * (ou - u) / s.Dh
 
 	pt := (p - lp) / (s.Dh * s.Rho)
-	dt := (ru + lu + uu + ou - 4*u)/math.Pow(s.Dh, 2)*s.Dvs
-	newUVelo := u - s.Dt*(uat+pt-dt)
+	dt := (ru + lu + uu + ou - 4*u) / math.Pow(s.Dh, 2) * s.Dvs
+	newUVelo := u - s.Dt*(at+pt-dt)
 	return newUVelo
 }
 
@@ -36,27 +36,27 @@ func (s *SimulationController) verNS(x int, y int) float64 {
 	p := s.PressCV.Get(x, y)
 	up := s.PressCV.Get(x, y-1)
 
-	var vat float64 = 0
-	vat += (u4 + math.Abs(u4)) / 2 * (v - lv) / s.Dh
-	vat += (u4 - math.Abs(u4)) / 2 * (rv - v) / s.Dh
-	vat += (v + math.Abs(v)) / 2 * (v - uv) / s.Dh
-	vat += (v - math.Abs(v)) / 2 * (ov - v) / s.Dh
+	var at float64 = 0
+	at += (u4 + math.Abs(u4)) / 2 * (v - lv) / s.Dh
+	at += (u4 - math.Abs(u4)) / 2 * (rv - v) / s.Dh
+	at += (v + math.Abs(v)) / 2 * (v - uv) / s.Dh
+	at += (v - math.Abs(v)) / 2 * (ov - v) / s.Dh
 
 	pt := (p - up) / (s.Dh * s.Rho)
-	dt := (rv + lv + uv + ov - 4*v)/math.Pow(s.Dh, 2)*s.Dvs
-	newVVelo := v - s.Dt*(vat+pt-dt)
+	dt := (rv + lv + uv + ov - 4*v) / math.Pow(s.Dh, 2) * s.Dvs
+	newVVelo := v - s.Dt*(at+pt-dt)
 	return newVVelo
 }
 
 func (s *SimulationController) Poisson(x int, y int, phi float64) float64 {
-	var newP float64 = 0
-	newP += s.PressCV.Get(x+1, y)
-	newP += s.PressCV.Get(x-1, y)
-	newP += s.PressCV.Get(x, y+1)
-	newP += s.PressCV.Get(x, y-1)
-	newP -= phi * math.Pow(s.Dh, 2)
-	newP /= 4
-	return newP
+	var p float64 = 0
+	p += s.PressCV.Get(x+1, y)
+	p += s.PressCV.Get(x-1, y)
+	p += s.PressCV.Get(x, y+1)
+	p += s.PressCV.Get(x, y-1)
+	p -= phi * math.Pow(s.Dh, 2)
+	p /= 4
+	return p
 }
 
 func (s *SimulationController) Phi(x int, y int) float64 {

@@ -14,11 +14,11 @@ const (
 	cavityGridHeight int = 254
 	cavityGridWidth  int = 254
 
-	xl        float64 = 0.02
-	dh        float64 = xl / float64(cavityGridWidth)
-	dt        float64 = 0.001
-	dvs       float64 = 1e-6
-	rho       float64 = 1000
+	xl  float64 = 0.02
+	dh  float64 = xl / float64(250)
+	dt  float64 = 0.001
+	dvs float64 = 1e-6
+	rho float64 = 1000
 	eps       float64 = 1e-6
 	initVelo  float64 = 0.
 	initPress float64 = 0.4
@@ -89,7 +89,7 @@ func main() {
 	sc.BoundaryCondition()
 	writeLog(0, sc)
 
-	for epoch := 1; epoch < 20; epoch++ {
+	for epoch := 1; epoch < 50; epoch++ {
 		sc.NextVelocity()
 		phi := volume.NewCVMap(cavityGridWidth, cavityGridHeight, 0.0)
 		// TODO magic number これはNextPressとのつながりがあるはず．
