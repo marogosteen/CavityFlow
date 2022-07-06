@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/marogosteen/cavityflow/volume"
 )
@@ -27,37 +28,38 @@ func (s *SimulationController) BoundaryCondition() {
 
 // Navier–Stokes equationsによるflowの計算
 func (s *SimulationController) NextVelocity() {
-	newHorVeloCVMap := volume.NewCVMap(s.HorVeloCV.MaxWidth, s.HorVeloCV.MaxHeight, 0.)
-	newVerVeloCVMap := volume.NewCVMap(s.VerVeloCV.MaxWidth, s.VerVeloCV.MaxHeight, 0.)
+	nextHorVeloCV := s.HorVeloCV.Clone()
+	nextVerVeloCV := s.VerVeloCV.Clone()
 	// TODO magic nuimber
 	for y := 3; y <= 252; y++ {
 		for x := 3; x <= 252; x++ {
-			newHorVeloCVMap[volume.Coodinate{X: x, Y: y}] = s.horNS(x, y)
-			newVerVeloCVMap[volume.Coodinate{X: x, Y: y}] = s.verNS(x, y)
+			nextHorVeloCV.Set(x, y, s.horNS(x, y))
+			nextVerVeloCV.Set(x, y, s.verNS(x, y))
 		}
 	}
 
-	s.HorVeloCV.CVMap = newHorVeloCVMap
-	s.VerVeloCV.CVMap = newVerVeloCVMap
+	s.HorVeloCV = &nextHorVeloCV
+	s.VerVeloCV = &nextVerVeloCV
 	// new cvmapはcavity内の計算のみで，境界条件を適応させていない．
 	s.BoundaryCondition()
 }
 
 func (s *SimulationController) NextPress(phi volume.CVMap) {
 	for count := 1; ; count++ {
-		nextPressCVMap := volume.NewCVMap(s.HorVeloCV.MaxWidth, s.HorVeloCV.MaxHeight, 0)
+		nextPressCV := s.PressCV.Clone()
 		loss := 0.
 		// TODO magic numebr
 		for y := 3; y <= 252; y++ {
 			for x := 3; x <= 252; x++ {
-				p := s.PressCV.Get(x, y)
 				np := s.Poisson(x, y, phi[volume.Coodinate{X: x, Y: y}])
+				nextPressCV.Set(x, y, np)
+
+				p := s.PressCV.Get(x, y)
 				dp := np - p
-				loss += dp * dp
-				nextPressCVMap[volume.Coodinate{X: x, Y: y}] = np
+				loss += math.Pow(dp, 2)
 			}
 		}
-		s.PressCV.CVMap = nextPressCVMap
+		s.PressCV = &nextPressCV
 		if loss < s.Eps {
 			fmt.Println(count)
 			break

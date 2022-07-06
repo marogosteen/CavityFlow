@@ -33,3 +33,19 @@ func (cv *VeloCV) Set(x int, y int, v float64) {
 	c := Coodinate{X: x, Y: y}
 	cv.CVMap[c] = v
 }
+
+func (cv *VeloCV) Clone() VeloCV {
+	cloneMap := make(CVMap)
+	for key, v := range(cv.CVMap){
+		cloneMap[key] = v
+	}
+
+	clone := VeloCV{
+		CVMap: cloneMap,
+		MaxHeight: cv.MaxHeight,
+		MaxWidth:  cv.MaxWidth,
+		MinHeight: cv.MinHeight,
+		MinWidth:  cv.MinWidth,
+	}
+	return clone
+}
