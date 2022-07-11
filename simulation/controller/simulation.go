@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"math"
 
 	"github.com/marogosteen/cavityflow/volume"
@@ -47,7 +46,7 @@ func (s *SimulationController) NextVelocity() {
 	s.BoundaryCondition()
 }
 
-func (s *SimulationController) NextPress(phi volume.CVMap) {
+func (s *SimulationController) NextPress(phi volume.CVMap) int {
 	for count := 1; ; count++ {
 		nextPressCV := s.PressCV.Clone()
 		loss := 0.
@@ -64,8 +63,7 @@ func (s *SimulationController) NextPress(phi volume.CVMap) {
 		}
 		s.PressCV = &nextPressCV
 		if loss < s.Eps {
-			fmt.Println(count)
-			break
+			return count
 		}
 	}
 }

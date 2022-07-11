@@ -99,7 +99,8 @@ func main() {
 			}
 		}
 
-		sc.NextPress(phi)
+		exec_count := sc.NextPress(phi)
+		fmt.Println(exec_count)
 		sc.BoundaryCondition()
 
 		writeLog(epoch, sc)
