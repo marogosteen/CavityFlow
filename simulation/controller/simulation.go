@@ -31,10 +31,13 @@ func (s *SimulationController) NextVelocity() {
 	nextHorVeloCV := s.HorVeloCV.Clone()
 	nextVerVeloCV := s.VerVeloCV.Clone()
 	// TODO magic nuimber
-	for y := 3; y <= 252; y++ {
+	for y := 3; y <= 253; y++ {
 		for x := 3; x <= 252; x++ {
-			nextHorVeloCV.Set(x, y, s.horNS(x, y))
 			nextVerVeloCV.Set(x, y, s.verNS(x, y))
+			// 主流部分の水平流速は計算しない
+			if y <= 252 {
+				nextHorVeloCV.Set(x, y, s.horNS(x, y))
+			}
 		}
 	}
 
@@ -70,10 +73,10 @@ func (s *SimulationController) NextPress(phi volume.CVMap) {
 // Vの定義点における周囲４点のU
 func (s *SimulationController) SurroundingHorVelo(x int, y int) float64 {
 	var velo float64 = 0.
-	velo += s.HorVeloCV.Get(x-1, y)
-	velo += s.HorVeloCV.Get(x-1, y+1)
+	velo += s.HorVeloCV.Get(x+1, y)
+	velo += s.HorVeloCV.Get(x+1, y-1)
 	velo += s.HorVeloCV.Get(x, y)
-	velo += s.HorVeloCV.Get(x-1, y+1)
+	velo += s.HorVeloCV.Get(x, y-1)
 	velo *= 0.25
 	return velo
 }
@@ -81,10 +84,10 @@ func (s *SimulationController) SurroundingHorVelo(x int, y int) float64 {
 // Uの定義点における周囲４点のV
 func (s *SimulationController) SurroundingVerVelo(x int, y int) float64 {
 	var velo float64 = 0.
+	velo += s.VerVeloCV.Get(x-1, y)
+	velo += s.VerVeloCV.Get(x-1, y+1)
 	velo += s.VerVeloCV.Get(x, y)
-	velo += s.VerVeloCV.Get(x, y-1)
-	velo += s.VerVeloCV.Get(x+1, y)
-	velo += s.VerVeloCV.Get(x+1, y-1)
+	velo += s.VerVeloCV.Get(x, y+1)
 	velo *= 0.25
 	return velo
 }

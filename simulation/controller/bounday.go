@@ -45,7 +45,7 @@ func (s *SimulationController) verVeloBoundaryCondition() {
 	for y := 1; y <= s.VerVeloCV.MaxHeight; y++ {
 		v := s.VerVeloCV.Get(rightmost-2, y)
 		s.VerVeloCV.Set(rightmost, y, v)
-		s.VerVeloCV.Set(rightmost-1, y, 0.)
+		s.VerVeloCV.Set(rightmost-1, y, v)
 	}
 
 	// 最下2段の流速は0
@@ -55,11 +55,10 @@ func (s *SimulationController) verVeloBoundaryCondition() {
 		s.VerVeloCV.Set(x, bottom+1, 0.)
 	}
 
-	// 最上2段の流速は0
+	// 最上段の流速は0
 	top := s.VerVeloCV.MaxHeight
 	for x := 1; x <= s.VerVeloCV.MaxWidth; x++ {
 		s.VerVeloCV.Set(x, top, 0.)
-		s.VerVeloCV.Set(x, top-1, 0.)
 	}
 }
 
