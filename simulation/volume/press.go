@@ -6,16 +6,12 @@ type PressCV struct {
 	CVMap     map[Coodinate]float64
 	MaxWidth  int
 	MaxHeight int
-	MinWidth  int
-	MinHeight int
 }
 
 func NewPressCV(width int, height int, initPress float64) (cv PressCV) {
 	cv.CVMap = NewCVMap(width, height, initPress)
 	cv.MaxWidth = width
 	cv.MaxHeight = height
-	cv.MinWidth = 1
-	cv.MinHeight = 1
 	return
 }
 
@@ -44,8 +40,6 @@ func (cv *PressCV) Clone() PressCV {
 		CVMap: cloneMap,
 		MaxHeight: cv.MaxHeight,
 		MaxWidth:  cv.MaxWidth,
-		MinHeight: cv.MinHeight,
-		MinWidth:  cv.MinWidth,
 	}
 	return clone
 }

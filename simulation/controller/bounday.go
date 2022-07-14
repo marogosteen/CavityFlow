@@ -49,7 +49,7 @@ func (s *SimulationController) verVeloBoundaryCondition() {
 	}
 
 	// 最下2段の流速は0
-	bottom := s.VerVeloCV.MinHeight
+	bottom := 1
 	for x := 1; x <= s.VerVeloCV.MaxWidth; x++ {
 		s.VerVeloCV.Set(x, bottom, 0.)
 		s.VerVeloCV.Set(x, bottom+1, 0.)
@@ -64,7 +64,7 @@ func (s *SimulationController) verVeloBoundaryCondition() {
 
 func (s *SimulationController) pressBoundaryCondition() {
 	// 最左2列の圧力は右列と同じ
-	leftmost := s.PressCV.MinWidth
+	leftmost := 1
 	for y := 1; y <= s.PressCV.MaxHeight; y++ {
 		v := s.PressCV.Get(leftmost+2, y)
 		s.PressCV.Set(leftmost, y, v)
@@ -72,7 +72,7 @@ func (s *SimulationController) pressBoundaryCondition() {
 	}
 
 	// 最右2列の圧力は左列と同じ
-	rightmost := s.PressCV.MaxHeight
+	rightmost := s.PressCV.MaxWidth
 	for y := 1; y <= s.PressCV.MaxHeight; y++ {
 		v := s.PressCV.Get(rightmost-2, y)
 		s.PressCV.Set(rightmost, y, v)
@@ -80,9 +80,9 @@ func (s *SimulationController) pressBoundaryCondition() {
 	}
 
 	// 最下2段の圧力は上段と同じ
-	bottom := s.PressCV.MinHeight
+	bottom := 1
 	for x := 1; x <= s.PressCV.MaxWidth; x++ {
-		v := s.PressCV.Get(bottom+2, x)
+		v := s.PressCV.Get(x, bottom+2)
 		s.PressCV.Set(x, bottom, v)
 		s.PressCV.Set(x, bottom+1, v)
 	}
@@ -90,7 +90,7 @@ func (s *SimulationController) pressBoundaryCondition() {
 	// 最上2段の圧力は下段と同じ
 	top := s.PressCV.MaxHeight
 	for x := 1; x <= s.PressCV.MaxWidth; x++ {
-		v := s.PressCV.Get(top-2, x)
+		v := s.PressCV.Get(x, top-2)
 		s.PressCV.Set(x, top, v)
 		s.PressCV.Set(x, top-1, v)
 	}
