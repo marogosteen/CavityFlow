@@ -1,6 +1,5 @@
 /* TODOs
 計算struct導入する
-log service
 終了条件
 */
 
@@ -54,16 +53,19 @@ func main() {
 	fp := fmt.Sprintf(logdir+"log%d.csv", 0)
 	logService.WriteLog(fp, sc.HorVelo.Grid, sc.VerVelo.Grid, sc.Press.Grid)
 
-	for epoch := 1; epoch < 30; epoch++ {
+	for epoch := 1; ; epoch++ {
 		sc.CalcVelocity()
 		phi := sc.NewPhi()
-
 		exec_count := sc.NextPress(phi)
 		sc.SetConditions()
 
 		fp := fmt.Sprintf(logdir+"log%d.csv", epoch)
 		logService.WriteLog(fp, sc.HorVelo.Grid, sc.VerVelo.Grid, sc.Press.Grid)
-		fmt.Printf("conpleted: %s, poisson: %d", fp, exec_count)
+		fmt.Printf("output: %s, velocity loss: %.5f, poisson: %d\n", fp, sc.VelocityLoss, exec_count)
+
+		if sc.VelocityLoss == 0.{
+			break
+		}
 	}
 
 	fmt.Println("done")

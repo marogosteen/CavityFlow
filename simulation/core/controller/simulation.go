@@ -7,6 +7,8 @@ import (
 )
 
 type SimulationController struct {
+	VelocityLoss float64
+
 	Dt    float64
 	Dh    float64
 	Eps   float64
@@ -42,6 +44,9 @@ func (s *SimulationController) CalcVelocity() {
 			nextVerVelo.Grid[y][x] = s.horNS(x, y)
 		}
 	}
+
+	s.calcVelocityLoss(nextHorVelo, nextVerVelo)
+
 	s.VerVelo = &nextVerVelo
 	s.HorVelo = &nextHorVelo
 	// cavity内の計算のみで，境界条件を適応させる必要がある．
@@ -109,4 +114,19 @@ func (s *SimulationController) NewPhi() [][]float64 {
 		}
 	}
 	return phi
+}
+
+func (s *SimulationController) calcVelocityLoss(hvv volume.Volume, vvv volume.Volume) float64 {
+	s.VelocityLoss = 0.
+	for y := 1; y < s.HorVelo.Height-1; y++ {
+		for x := 2; x < s.HorVelo.Width-2; x++ {
+			s.VelocityLoss += math.Abs(s.HorVelo.Grid[y][x] - hvv.Grid[y][x])
+		}
+	}
+	for y := 2; y < s.VerVelo.Height-2; y++ {
+		for x := 1; x < s.VerVelo.Width-1; x++ {
+			s.VelocityLoss += math.Abs(s.VerVelo.Grid[y][x] - vvv.Grid[y][x])
+		}
+	}
+	return s.VelocityLoss
 }
