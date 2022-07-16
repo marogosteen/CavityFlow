@@ -4,15 +4,20 @@ import (
 	"math"
 )
 
+const (
+	rho       float64 = 1000
+	dvs       float64 = 1e-6
+)
+
 func (s *SimulationController) horNS(x int, y int) float64 {
-	u := s.HorVeloCV.Get(x, y)
-	lu := s.HorVeloCV.Get(x-1, y)
-	ru := s.HorVeloCV.Get(x+1, y)
-	ou := s.HorVeloCV.Get(x, y+1)
-	uu := s.HorVeloCV.Get(x, y-1)
+	u := s.HorVelo.Get(x, y)
+	lu := s.HorVelo.Get(x-1, y)
+	ru := s.HorVelo.Get(x+1, y)
+	ou := s.HorVelo.Get(x, y+1)
+	uu := s.HorVelo.Get(x, y-1)
 	v4 := s.SurroundingVerVelo(x, y)
-	p := s.PressCV.Get(x, y)
-	lp := s.PressCV.Get(x-1, y)
+	p := s.Press.Get(x, y)
+	lp := s.Press.Get(x-1, y)
 
 	var at float64 = 0
 	at += (u + math.Abs(u)) / 2 * (u - lu) / s.Dh
@@ -20,21 +25,21 @@ func (s *SimulationController) horNS(x int, y int) float64 {
 	at += (v4 + math.Abs(v4)) / 2 * (u - uu) / s.Dh
 	at += (v4 - math.Abs(v4)) / 2 * (ou - u) / s.Dh
 
-	pt := (p - lp) / (s.Dh * s.Rho)
-	dt := (ru + lu + uu + ou - 4*u) / math.Pow(s.Dh, 2) * s.Dvs
+	pt := (p - lp) / (s.Dh * rho)
+	dt := (ru + lu + uu + ou - 4*u) / math.Pow(s.Dh, 2) * dvs
 	newUVelo := u - s.Dt*(at+pt-dt)
 	return newUVelo
 }
 
 func (s *SimulationController) verNS(x int, y int) float64 {
-	v := s.VerVeloCV.Get(x, y)
-	lv := s.VerVeloCV.Get(x-1, y)
-	rv := s.VerVeloCV.Get(x+1, y)
-	ov := s.VerVeloCV.Get(x, y+1)
-	uv := s.VerVeloCV.Get(x, y-1)
+	v := s.VerVelo.Get(x, y)
+	lv := s.VerVelo.Get(x-1, y)
+	rv := s.VerVelo.Get(x+1, y)
+	ov := s.VerVelo.Get(x, y+1)
+	uv := s.VerVelo.Get(x, y-1)
 	u4 := s.SurroundingHorVelo(x, y)
-	p := s.PressCV.Get(x, y)
-	up := s.PressCV.Get(x, y-1)
+	p := s.Press.Get(x, y)
+	up := s.Press.Get(x, y-1)
 
 	var at float64 = 0
 	at += (u4 + math.Abs(u4)) / 2 * (v - lv) / s.Dh
@@ -42,43 +47,43 @@ func (s *SimulationController) verNS(x int, y int) float64 {
 	at += (v + math.Abs(v)) / 2 * (v - uv) / s.Dh
 	at += (v - math.Abs(v)) / 2 * (ov - v) / s.Dh
 
-	pt := (p - up) / (s.Dh * s.Rho)
-	dt := (rv + lv + uv + ov - 4*v) / math.Pow(s.Dh, 2) * s.Dvs
+	pt := (p - up) / (s.Dh * rho)
+	dt := (rv + lv + uv + ov - 4*v) / math.Pow(s.Dh, 2) * dvs
 	newVVelo := v - s.Dt*(at+pt-dt)
 	return newVVelo
 }
 
 func (s *SimulationController) Poisson(x int, y int, phi float64) float64 {
 	var p float64 = 0
-	p += s.PressCV.Get(x+1, y)
-	p += s.PressCV.Get(x-1, y)
-	p += s.PressCV.Get(x, y+1)
-	p += s.PressCV.Get(x, y-1)
+	p += s.Press.Get(x+1, y)
+	p += s.Press.Get(x-1, y)
+	p += s.Press.Get(x, y+1)
+	p += s.Press.Get(x, y-1)
 	p -= phi * math.Pow(s.Dh, 2)
 	p /= 4
 	return p
 }
 
 func (s *SimulationController) Phi(x int, y int) float64 {
-	u := s.HorVeloCV.Get(x, y)
-	ou := s.HorVeloCV.Get(x, y+1)
-	uu := s.HorVeloCV.Get(x, y-1)
-	ru := s.HorVeloCV.Get(x+1, y)
-	r2u := s.HorVeloCV.Get(x+2, y)
-	lu := s.HorVeloCV.Get(x-1, y)
-	oru := s.HorVeloCV.Get(x+1, y+1)
-	uru := s.HorVeloCV.Get(x+1, y-1)
+	u := s.HorVelo.Get(x, y)
+	ou := s.HorVelo.Get(x, y+1)
+	uu := s.HorVelo.Get(x, y-1)
+	ru := s.HorVelo.Get(x+1, y)
+	r2u := s.HorVelo.Get(x+2, y)
+	lu := s.HorVelo.Get(x-1, y)
+	oru := s.HorVelo.Get(x+1, y+1)
+	uru := s.HorVelo.Get(x+1, y-1)
 	u4 := s.SurroundingHorVelo(x, y)
 	ou4 := s.SurroundingHorVelo(x, y+1)
 
-	v := s.VerVeloCV.Get(x, y)
-	ov := s.VerVeloCV.Get(x, y+1)
-	o2v := s.VerVeloCV.Get(x, y+2)
-	uv := s.VerVeloCV.Get(x, y-1)
-	rv := s.VerVeloCV.Get(x+1, y)
-	lv := s.VerVeloCV.Get(x-1, y)
-	orv := s.VerVeloCV.Get(x+1, y+1)
-	olv := s.VerVeloCV.Get(x-1, y+1)
+	v := s.VerVelo.Get(x, y)
+	ov := s.VerVelo.Get(x, y+1)
+	o2v := s.VerVelo.Get(x, y+2)
+	uv := s.VerVelo.Get(x, y-1)
+	rv := s.VerVelo.Get(x+1, y)
+	lv := s.VerVelo.Get(x-1, y)
+	orv := s.VerVelo.Get(x+1, y+1)
+	olv := s.VerVelo.Get(x-1, y+1)
 	v4 := s.SurroundingVerVelo(x, y)
 	rv4 := s.SurroundingVerVelo(x+1, y)
 
@@ -98,5 +103,5 @@ func (s *SimulationController) Phi(x int, y int) float64 {
 	pp3 -= u4*(rv-lv)/(2*s.Dh) + v*(ov-uv)/(2*s.Dh)
 	pp3 *= -1 / s.Dh
 
-	return s.Rho * (pp1 + pp2 + pp3)
+	return rho * (pp1 + pp2 + pp3)
 }
