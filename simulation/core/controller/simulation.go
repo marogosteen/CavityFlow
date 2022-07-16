@@ -39,7 +39,7 @@ func (s *SimulationController) CalcVelocity() {
 	}
 	for y := 1; y < 251; y++ {
 		for x := 2; x < 251; x++ {
-			nextVerVelo.Grid[y][x] = s.horNS(x, y)
+			nextHorVelo.Grid[y][x] = s.horNS(x, y)
 		}
 	}
 	s.VerVelo = &nextVerVelo

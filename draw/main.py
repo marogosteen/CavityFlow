@@ -36,8 +36,8 @@ def reshape_2d(array: np.ndarray, omit: int = 1) -> np.ndarray:
     if omit < 1:
         raise ValueError()
 
-    array = array.reshape(HEIGHT, WIDTH)
-    array = array[:HEIGHT]
+    array = array.reshape(HEIGHT+2, WIDTH+2)
+    array = array[1:HEIGHT+1, 1:WIDTH+1]
     for _ in range(HEIGHT % omit):
         array = (array[:-1, :] + array[1:, :]) / 2
     for _ in range(WIDTH % omit):

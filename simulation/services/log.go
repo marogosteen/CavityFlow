@@ -40,8 +40,8 @@ func (s *LogService) WriteLog(fp string, hvv [][]float64, vvv [][]float64, pv []
 	fmt.Println("conplete: " + fp)
 
 	// TODO magic number
-	for y := 1; y < 251; y++ {
-		for x := 1; x < 251; x++ {
+	for y := 0; y < 252; y++ {
+		for x := 0; x < 252; x++ {
 			u := (hvv[y][x] + hvv[y][x+1]) / 2
 			v := (vvv[y][x] + vvv[y+1][x]) / 2
 			p := pv[y][x]
