@@ -12,10 +12,10 @@ func init() {
 
 func TestVolumeClone(t *testing.T) {
 	cv := v.Clone()
-	cv.Set(0, 0, 99.)
+	cv.Grid[0][0] = 99.
 
-	before := v.Get(0, 0)
-	after := cv.Get(0, 0)
+	before := v.Grid[0][0]
+	after := cv.Grid[0][0]
 	if !(before == 0. && after == 99.) {
 		t.Errorf("before: %f after: %f", before, after)
 	}

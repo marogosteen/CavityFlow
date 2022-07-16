@@ -1,9 +1,9 @@
 package volume
 
 type Volume struct {
-	Grid      [][]float64
-	MaxWidth  int
-	MaxHeight int
+	Grid   [][]float64
+	Width  int
+	Height int
 }
 
 func NewVolume(w int, h int, val float64) (cv Volume) {
@@ -18,29 +18,21 @@ func NewVolume(w int, h int, val float64) (cv Volume) {
 		}
 	}
 	cv.Grid = s
-	cv.MaxWidth = w
-	cv.MaxHeight = h
+	cv.Width = w
+	cv.Height = h
 	return
-}
-
-func (vol *Volume) Get(x int, y int) float64 {
-	return vol.Grid[y][x]
-}
-
-func (vol *Volume) Set(x int, y int, v float64) {
-	vol.Grid[y][x] = v
 }
 
 func (vol *Volume) Clone() Volume {
 	var s [][]float64
-	for y := 0; y < vol.MaxHeight; y++ {
-		line := make([]float64, vol.MaxWidth)
+	for y := 0; y < vol.Height; y++ {
+		line := make([]float64, vol.Width)
 		copy(line, vol.Grid[y])
 		s = append(s, line)
 	}
 	return Volume{
-		Grid:      s,
-		MaxHeight: vol.MaxHeight,
-		MaxWidth:  vol.MaxWidth,
+		Grid:   s,
+		Height: vol.Height,
+		Width:  vol.Width,
 	}
 }

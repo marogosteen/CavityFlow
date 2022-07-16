@@ -34,12 +34,12 @@ func (s *SimulationController) CalcVelocity() {
 	// // 主流部分の垂直流速の計算は縦に1Grid多い
 	for y := 2; y < 251; y++ {
 		for x := 1; x < 251; x++ {
-			nextVerVelo.Set(x, y, s.verNS(x, y))
+			nextVerVelo.Grid[y][x] = s.verNS(x, y)
 		}
 	}
 	for y := 1; y < 251; y++ {
 		for x := 2; x < 251; x++ {
-			nextHorVelo.Set(x, y, s.horNS(x, y))
+			nextVerVelo.Grid[y][x] = s.horNS(x, y)
 		}
 	}
 	s.VerVelo = &nextVerVelo
@@ -55,10 +55,10 @@ func (s *SimulationController) NextPress(phi [][]float64) int {
 		// TODO magic numebr
 		for y := 1; y < 251; y++ {
 			for x := 1; x < 251; x++ {
-				p := s.Press.Get(x, y)
+				p := s.Press.Grid[y][x]
 				np := s.Poisson(x, y, phi[y][x])
 				// np = p*(1-s.Omega) + s.Omega*np
-				nextPressCV.Set(x, y, np)
+				nextPressCV.Grid[y][x] = np
 
 				dp := np - p
 				loss += math.Pow(dp, 2)
@@ -74,10 +74,10 @@ func (s *SimulationController) NextPress(phi [][]float64) int {
 // Vの定義点における周囲４点のU
 func (s *SimulationController) SurroundingHorVelo(x int, y int) float64 {
 	var velo float64 = 0.
-	velo += s.HorVelo.Get(x+1, y)
-	velo += s.HorVelo.Get(x+1, y-1)
-	velo += s.HorVelo.Get(x, y)
-	velo += s.HorVelo.Get(x, y-1)
+	velo += s.HorVelo.Grid[y][x+1]
+	velo += s.HorVelo.Grid[y-1][x+1]
+	velo += s.HorVelo.Grid[y][x] 
+	velo += s.HorVelo.Grid[y-1][x]
 	velo *= 0.25
 	return velo
 }
@@ -85,10 +85,10 @@ func (s *SimulationController) SurroundingHorVelo(x int, y int) float64 {
 // Uの定義点における周囲４点のV
 func (s *SimulationController) SurroundingVerVelo(x int, y int) float64 {
 	var velo float64 = 0.
-	velo += s.VerVelo.Get(x-1, y)
-	velo += s.VerVelo.Get(x-1, y+1)
-	velo += s.VerVelo.Get(x, y)
-	velo += s.VerVelo.Get(x, y+1)
+	velo += s.VerVelo.Grid[y][x-1]
+	velo += s.VerVelo.Grid[y+1][x-1]
+	velo += s.VerVelo.Grid[y][x]
+	velo += s.VerVelo.Grid[y+1][x]
 	velo *= 0.25
 	return velo
 }

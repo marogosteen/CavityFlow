@@ -13,90 +13,83 @@ func NewBoudaryCondition(mf float64) BoundaryCondition {
 }
 
 func (bf *BoundaryCondition) HorVelo(vol *volume.Volume) {
-	// 最左2列の流速は0
+	// 最左列の水平流速は0
 	leftmost := 0
-	for y := 0; y < vol.MaxHeight; y++ {
-		vol.Set(leftmost, y, 0.)
-		vol.Set(leftmost+1, y, 0.)
+	for y := 0; y < vol.Height; y++ {
+		vol.Grid[y][leftmost] = 0.
+		vol.Grid[y][leftmost+1] = 0.
 	}
 
-	// 最右2列の流速は0
-	rightmost := vol.MaxWidth - 1
-	for y := 0; y < vol.MaxHeight; y++ {
-		vol.Set(rightmost, y, 0.)
-		vol.Set(rightmost-1, y, 0.)
+	// 最右列の水平流速は0
+	rightmost := vol.Width - 1
+	for y := 0; y < vol.Height; y++ {
+		vol.Grid[y][rightmost] = 0.
+		vol.Grid[y][rightmost-1] = 0.
 	}
 
-	// 最下2段の流速は上段と同じ
+	// 最下段の水平流速は上段と同じ
 	bottom := 0
-	for x := 0; x < vol.MaxWidth; x++ {
-		v := vol.Get(x, bottom+1)
-		vol.Set(x, bottom, v)
+	for x := 0; x < vol.Width; x++ {
+		vol.Grid[bottom][x] = vol.Grid[bottom+1][x]
 	}
 
-	// 最上段の流速は0，上から二段目は主流
-	top := vol.MaxHeight - 1
-	for x := 0; x < vol.MaxWidth; x++ {
-		vol.Set(x, top, bf.mainFlow)
+	// 最上段の水平流速は主流速
+	top := vol.Height - 1
+	for x := 0; x < vol.Width; x++ {
+		vol.Grid[top][x] = bf.mainFlow
 	}
 }
 
 func (bf *BoundaryCondition) VerVelo(vol *volume.Volume) {
-	// 最左2列の流速は右列と同じ
+	// 最左列の垂直流速は右列と同じ
 	leftmost := 0
-	for y := 0; y < vol.MaxHeight; y++ {
-		v := vol.Get(leftmost+1, y)
-		vol.Set(leftmost, y, v)
+	for y := 0; y < vol.Height; y++ {
+		vol.Grid[y][leftmost] = vol.Grid[y][leftmost+1]
 	}
 
-	// 最右2列の流速は左列と同じ
-	rightmost := vol.MaxWidth - 1
-	for y := 0; y < vol.MaxHeight; y++ {
-		v := vol.Get(rightmost-1, y)
-		vol.Set(rightmost, y, v)
+	// 最右列の垂直流速は左列と同じ
+	rightmost := vol.Width - 1
+	for y := 0; y < vol.Height; y++ {
+		vol.Grid[y][rightmost] = vol.Grid[y][rightmost-1]
 	}
 
-	// 最下2段の流速は0
+	// 最下2段の垂直流速は0
 	bottom := 0
-	for x := 0; x < vol.MaxWidth; x++ {
-		vol.Set(x, bottom, 0.)
-		vol.Set(x, bottom+1, 0.)
+	for x := 0; x < vol.Width; x++ {
+		vol.Grid[bottom][x] = 0.
+		vol.Grid[bottom+1][x] = 0.
 	}
 
-	// 最上2段の流速は0
-	top := vol.MaxHeight - 1
-	for x := 0; x < vol.MaxWidth; x++ {
-		vol.Set(x, top, 0.)
-		vol.Set(x, top-1, 0.)
+	// 最上2段の垂直流速は0
+	top := vol.Height - 1
+	for x := 0; x < vol.Width; x++ {
+		vol.Grid[top][x] = 0.
+		vol.Grid[top-1][x] = 0.
 	}
 }
 
 func (bf *BoundaryCondition) Press(vol *volume.Volume) {
-	// 最左2列の圧力は右列と同じ
+	// 最左列は右列と同じ
 	leftmost := 0
-	for y := 0; y < vol.MaxHeight; y++ {
-		v := vol.Get(leftmost+1, y)
-		vol.Set(leftmost, y, v)
+	for y := 0; y < vol.Height; y++ {
+		vol.Grid[y][leftmost] = vol.Grid[y][leftmost+1]
 	}
 
-	// 最右2列の圧力は左列と同じ
-	rightmost := vol.MaxWidth - 1
-	for y := 0; y < vol.MaxHeight; y++ {
-		v := vol.Get(rightmost-1, y)
-		vol.Set(rightmost, y, v)
+	// 最右列は左列と同じ
+	rightmost := vol.Width - 1
+	for y := 0; y < vol.Height; y++ {
+		vol.Grid[y][rightmost] = vol.Grid[y][rightmost-1]
 	}
 
-	// 最下2段の圧力は上段と同じ
+	// 最下段の圧力は上段と同じ
 	bottom := 0
-	for x := 0; x < vol.MaxWidth; x++ {
-		v := vol.Get(x, bottom+1)
-		vol.Set(x, bottom, v)
+	for x := 0; x < vol.Width; x++ {
+		vol.Grid[bottom][x] = vol.Grid[bottom+1][x]
 	}
 
-	// 最上2段の圧力は下段と同じ
-	top := vol.MaxHeight - 1
-	for x := 0; x < vol.MaxWidth; x++ {
-		v := vol.Get(x, top-1)
-		vol.Set(x, top, v)
+	// 最上段の圧力は下段と同じ
+	top := vol.Height - 1
+	for x := 0; x < vol.Width; x++ {
+		vol.Grid[top][x] = vol.Grid[top-1][x]
 	}
 }

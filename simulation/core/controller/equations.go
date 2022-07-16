@@ -5,19 +5,19 @@ import (
 )
 
 const (
-	rho       float64 = 1000
-	dvs       float64 = 1e-6
+	rho float64 = 1000
+	dvs float64 = 1e-6
 )
 
 func (s *SimulationController) horNS(x int, y int) float64 {
-	u := s.HorVelo.Get(x, y)
-	lu := s.HorVelo.Get(x-1, y)
-	ru := s.HorVelo.Get(x+1, y)
-	ou := s.HorVelo.Get(x, y+1)
-	uu := s.HorVelo.Get(x, y-1)
+	u := s.HorVelo.Grid[y][x]
+	lu := s.HorVelo.Grid[y][x-1]
+	ru := s.HorVelo.Grid[y][x+1]
+	ou := s.HorVelo.Grid[y+1][x]
+	uu := s.HorVelo.Grid[y-1][x]
 	v4 := s.SurroundingVerVelo(x, y)
-	p := s.Press.Get(x, y)
-	lp := s.Press.Get(x-1, y)
+	p := s.Press.Grid[y][x]
+	lp := s.Press.Grid[y][x-1]
 
 	var at float64 = 0
 	at += (u + math.Abs(u)) / 2 * (u - lu) / s.Dh
@@ -32,14 +32,14 @@ func (s *SimulationController) horNS(x int, y int) float64 {
 }
 
 func (s *SimulationController) verNS(x int, y int) float64 {
-	v := s.VerVelo.Get(x, y)
-	lv := s.VerVelo.Get(x-1, y)
-	rv := s.VerVelo.Get(x+1, y)
-	ov := s.VerVelo.Get(x, y+1)
-	uv := s.VerVelo.Get(x, y-1)
+	v := s.VerVelo.Grid[y][x]
+	lv := s.VerVelo.Grid[y][x-1]
+	rv := s.VerVelo.Grid[y][x+1]
+	ov := s.VerVelo.Grid[y+1][x]
+	uv := s.VerVelo.Grid[y-1][x]
 	u4 := s.SurroundingHorVelo(x, y)
-	p := s.Press.Get(x, y)
-	up := s.Press.Get(x, y-1)
+	p := s.Press.Grid[y][x]
+	up := s.Press.Grid[y-1][x]
 
 	var at float64 = 0
 	at += (u4 + math.Abs(u4)) / 2 * (v - lv) / s.Dh
@@ -55,35 +55,35 @@ func (s *SimulationController) verNS(x int, y int) float64 {
 
 func (s *SimulationController) Poisson(x int, y int, phi float64) float64 {
 	var p float64 = 0
-	p += s.Press.Get(x+1, y)
-	p += s.Press.Get(x-1, y)
-	p += s.Press.Get(x, y+1)
-	p += s.Press.Get(x, y-1)
+	p += s.Press.Grid[y][x+1]
+	p += s.Press.Grid[y][x-1]
+	p += s.Press.Grid[y+1][x]
+	p += s.Press.Grid[y-1][x]
 	p -= phi * math.Pow(s.Dh, 2)
 	p /= 4
 	return p
 }
 
 func (s *SimulationController) Phi(x int, y int) float64 {
-	u := s.HorVelo.Get(x, y)
-	ou := s.HorVelo.Get(x, y+1)
-	uu := s.HorVelo.Get(x, y-1)
-	ru := s.HorVelo.Get(x+1, y)
-	r2u := s.HorVelo.Get(x+2, y)
-	lu := s.HorVelo.Get(x-1, y)
-	oru := s.HorVelo.Get(x+1, y+1)
-	uru := s.HorVelo.Get(x+1, y-1)
+	u := s.HorVelo.Grid[y][x]
+	ou := s.HorVelo.Grid[y+1][x]
+	uu := s.HorVelo.Grid[y-1][x]
+	ru := s.HorVelo.Grid[y][x+1]
+	r2u := s.HorVelo.Grid[y][x+2]
+	lu := s.HorVelo.Grid[y][x-1]
+	oru := s.HorVelo.Grid[y+1][x+1]
+	uru := s.HorVelo.Grid[y-1][x+1]
 	u4 := s.SurroundingHorVelo(x, y)
 	ou4 := s.SurroundingHorVelo(x, y+1)
 
-	v := s.VerVelo.Get(x, y)
-	ov := s.VerVelo.Get(x, y+1)
-	o2v := s.VerVelo.Get(x, y+2)
-	uv := s.VerVelo.Get(x, y-1)
-	rv := s.VerVelo.Get(x+1, y)
-	lv := s.VerVelo.Get(x-1, y)
-	orv := s.VerVelo.Get(x+1, y+1)
-	olv := s.VerVelo.Get(x-1, y+1)
+	v := s.VerVelo.Grid[y][x]
+	ov := s.VerVelo.Grid[y+1][x]
+	o2v := s.VerVelo.Grid[y+2][x]
+	uv := s.VerVelo.Grid[y-1][x]
+	rv := s.VerVelo.Grid[y][x+1]
+	lv := s.VerVelo.Grid[y][x-1]
+	orv := s.VerVelo.Grid[y+1][x+1]
+	olv := s.VerVelo.Grid[y+1][x-1]
 	v4 := s.SurroundingVerVelo(x, y)
 	rv4 := s.SurroundingVerVelo(x+1, y)
 

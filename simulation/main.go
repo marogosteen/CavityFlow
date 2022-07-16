@@ -1,6 +1,7 @@
 /* TODOs
 計算struct導入する
 log service
+終了条件
 */
 
 package main
