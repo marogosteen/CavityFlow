@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 SKIPROW = 1
 LOGDIR = "../log/"
 OUTPUTDIR = "../image/"
-HEIGHT = 252
-WIDTH = 252
+HEIGHT = 250
+WIDTH = 250
 U_COL = 0
 V_COL = 1
 P_COL = 2
@@ -60,7 +60,7 @@ else:
         os.remove(fp)
 
 files = glob.glob(LOGDIR+"*.csv")
-for fp in files[:1]:
+for fp in files:
     cavity_array = np.array(read_data(fp))
     u = reshape_2d(cavity_array[:, U_COL], omit=omit)
     v = reshape_2d(cavity_array[:, V_COL], omit=omit)
