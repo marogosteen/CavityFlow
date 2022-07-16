@@ -37,7 +37,6 @@ func (s *LogService) WriteLog(fp string, hvv [][]float64, vvv [][]float64, pv []
 
 	bw := bufio.NewWriter(f)
 	bw.WriteString("y,x,u,v,p\n")
-	fmt.Println("conplete: " + fp)
 
 	// TODO magic number
 	for y := 1; y < 251; y++ {

@@ -45,7 +45,8 @@ func (s *SimulationController) CalcVelocity() {
 	s.VerVelo = &nextVerVelo
 	s.HorVelo = &nextHorVelo
 	// cavity内の計算のみで，境界条件を適応させる必要がある．
-	s.SetConditions()
+	s.Conditions.HorVelo(s.HorVelo)
+	s.Conditions.VerVelo(s.VerVelo)
 }
 
 func (s *SimulationController) NextPress(phi [][]float64) int {
@@ -65,6 +66,9 @@ func (s *SimulationController) NextPress(phi [][]float64) int {
 			}
 		}
 		s.Press = &nextPressCV
+		// cavity内の計算のみで，境界条件を適応させる必要がある．
+		s.Conditions.Press(s.Press)
+
 		if loss < s.Eps {
 			return count
 		}
@@ -76,7 +80,7 @@ func (s *SimulationController) SurroundingHorVelo(x int, y int) float64 {
 	var velo float64 = 0.
 	velo += s.HorVelo.Grid[y][x+1]
 	velo += s.HorVelo.Grid[y-1][x+1]
-	velo += s.HorVelo.Grid[y][x] 
+	velo += s.HorVelo.Grid[y][x]
 	velo += s.HorVelo.Grid[y-1][x]
 	velo *= 0.25
 	return velo
@@ -96,7 +100,7 @@ func (s *SimulationController) SurroundingVerVelo(x int, y int) float64 {
 func (s *SimulationController) NewPhi() [][]float64 {
 	var phi [][]float64
 	for y := 0; y < 252; y++ {
-			phi = append(phi, make([]float64, 252))
+		phi = append(phi, make([]float64, 252))
 	}
 	// TODO magic number これはNextPressとのつながりがあるはず．
 	for y := 1; y < 251; y++ {

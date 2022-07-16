@@ -60,10 +60,10 @@ func main() {
 
 		exec_count := sc.NextPress(phi)
 		sc.SetConditions()
-		fmt.Println(exec_count)
 
 		fp := fmt.Sprintf(logdir+"log%d.csv", epoch)
 		logService.WriteLog(fp, sc.HorVelo.Grid, sc.VerVelo.Grid, sc.Press.Grid)
+		fmt.Printf("conpleted: %s, poisson: %d", fp, exec_count)
 	}
 
 	fmt.Println("done")
