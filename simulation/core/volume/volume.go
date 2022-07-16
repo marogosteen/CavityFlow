@@ -34,9 +34,10 @@ func (vol *Volume) Set(x int, y int, v float64) {
 func (vol *Volume) Clone() Volume {
 	var s [][]float64
 	for y := 0; y < vol.MaxHeight; y++ {
-		s = append(s, make([]float64, vol.MaxWidth))
+		line := make([]float64, vol.MaxWidth)
+		copy(line, vol.Grid[y])
+		s = append(s, line)
 	}
-	copy(s, vol.Grid)
 	return Volume{
 		Grid:      s,
 		MaxHeight: vol.MaxHeight,
