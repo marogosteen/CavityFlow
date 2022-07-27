@@ -1,6 +1,8 @@
 package controller
 
-import "github.com/marogosteen/cavityflow/core/volume"
+import (
+	"github.com/marogosteen/cavityflow/core/volume"
+)
 
 type BoundaryCondition struct {
 	mainFlow float64

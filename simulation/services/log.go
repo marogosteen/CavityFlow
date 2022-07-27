@@ -39,8 +39,8 @@ func (s *LogService) WriteLog(fp string, hvv [][]float64, vvv [][]float64, pv []
 	bw.WriteString("y,x,u,v,p\n")
 
 	// TODO magic number
-	for y := 0; y < 252; y++ {
-		for x := 0; x < 252; x++ {
+	for y := 0; y < 66; y++ {
+		for x := 0; x < 66; x++ {
 			u := (hvv[y][x] + hvv[y][x+1]) / 2
 			v := (vvv[y][x] + vvv[y+1][x]) / 2
 			p := pv[y][x]

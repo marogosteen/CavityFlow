@@ -1,6 +1,8 @@
 /* TODOs
 計算struct導入する
 終了条件
+NSの計算座標確認
+境界条件x=1のHVがおかしい
 */
 
 package main
@@ -14,8 +16,8 @@ import (
 )
 
 const (
-	cavityGridHeight int = 252
-	cavityGridWidth  int = 252
+	cavityGridHeight int = 66
+	cavityGridWidth  int = 66
 
 	xl        float64 = 0.02
 	dh        float64 = xl / float64(250)
@@ -49,21 +51,20 @@ func main() {
 		Press:      &press,
 	}
 	sc.SetConditions()
+	exec_count := sc.NextPress()
+	fmt.Printf("poisson: %d\n", exec_count)
 
 	fp := fmt.Sprintf(logdir+"log%d.csv", 0)
 	logService.WriteLog(fp, sc.HorVelo.Grid, sc.VerVelo.Grid, sc.Press.Grid)
 
 	for epoch := 1; ; epoch++ {
 		sc.CalcVelocity()
-		phi := sc.NewPhi()
-		exec_count := sc.NextPress(phi)
-		sc.SetConditions()
-
+		exec_count := sc.NextPress()
 		fp := fmt.Sprintf(logdir+"log%d.csv", epoch)
 		logService.WriteLog(fp, sc.HorVelo.Grid, sc.VerVelo.Grid, sc.Press.Grid)
 		fmt.Printf("output: %s, velocity loss: %.5f, poisson: %d\n", fp, sc.VelocityLoss, exec_count)
 
-		if sc.VelocityLoss == 0.{
+		if sc.VelocityLoss == 0. {
 			break
 		}
 	}

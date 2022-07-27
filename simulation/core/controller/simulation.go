@@ -34,13 +34,13 @@ func (s *SimulationController) CalcVelocity() {
 
 	// TODO magic nuimber
 	// // 主流部分の垂直流速の計算は縦に1Grid多い
-	for y := 2; y < 251; y++ {
-		for x := 1; x < 251; x++ {
+	for y := 2; y < 65; y++ {
+		for x := 1; x < 65; x++ {
 			nextVerVelo.Grid[y][x] = s.verNS(x, y)
 		}
 	}
-	for y := 1; y < 251; y++ {
-		for x := 2; x < 251; x++ {
+	for y := 1; y < 65; y++ {
+		for x := 2; x < 65; x++ {
 			nextHorVelo.Grid[y][x] = s.horNS(x, y)
 		}
 	}
@@ -50,27 +50,27 @@ func (s *SimulationController) CalcVelocity() {
 	s.VerVelo = &nextVerVelo
 	s.HorVelo = &nextHorVelo
 	// cavity内の計算のみで，境界条件を適応させる必要がある．
-	s.Conditions.HorVelo(s.HorVelo)
 	s.Conditions.VerVelo(s.VerVelo)
+	s.Conditions.HorVelo(s.HorVelo)
 }
 
-func (s *SimulationController) NextPress(phi [][]float64) int {
+func (s *SimulationController) NextPress() int {
+	phi := s.newPhi()
 	for count := 1; ; count++ {
-		nextPressCV := s.Press.Clone()
+		next := s.Press.Clone()
 		loss := 0.
 		// TODO magic numebr
-		for y := 1; y < 251; y++ {
-			for x := 1; x < 251; x++ {
-				p := s.Press.Grid[y][x]
+		for y := 1; y < 65; y++ {
+			for x := 1; x < 65; x++ {
 				np := s.Poisson(x, y, phi[y][x])
 				// np = p*(1-s.Omega) + s.Omega*np
-				nextPressCV.Grid[y][x] = np
+				next.Grid[y][x] = np
 
-				dp := np - p
+				dp := np - s.Press.Grid[y][x]
 				loss += math.Pow(dp, 2)
 			}
 		}
-		s.Press = &nextPressCV
+		s.Press = &next
 		// cavity内の計算のみで，境界条件を適応させる必要がある．
 		s.Conditions.Press(s.Press)
 
@@ -102,14 +102,14 @@ func (s *SimulationController) SurroundingVerVelo(x int, y int) float64 {
 	return velo
 }
 
-func (s *SimulationController) NewPhi() [][]float64 {
+func (s *SimulationController) newPhi() [][]float64 {
 	var phi [][]float64
-	for y := 0; y < 252; y++ {
+	for y := 0; y < 66; y++ {
 		phi = append(phi, make([]float64, 252))
 	}
 	// TODO magic number これはNextPressとのつながりがあるはず．
-	for y := 1; y < 251; y++ {
-		for x := 1; x < 251; x++ {
+	for y := 1; y < 65; y++ {
+		for x := 1; x < 65; x++ {
 			phi[y][x] = s.Phi(x, y)
 		}
 	}

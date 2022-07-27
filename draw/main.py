@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 SKIPROW = 1
 LOGDIR = "../log/"
 OUTPUTDIR = "../image/"
-HEIGHT = 250
-WIDTH = 250
+HEIGHT = 64
+WIDTH = 64
 U_COL = 0
 V_COL = 1
 P_COL = 2
