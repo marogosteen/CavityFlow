@@ -32,7 +32,7 @@ func (bf *BoundaryCondition) HorVelo(vol *volume.Volume) {
 	// 最下段の水平流速は上段と同じ
 	bottom := 0
 	for x := 0; x < vol.Width; x++ {
-		vol.Grid[bottom][x] = vol.Grid[bottom+1][x]
+		vol.Grid[bottom][x] = -vol.Grid[bottom+1][x]
 	}
 
 	// 最上段の水平流速は主流速
@@ -46,13 +46,13 @@ func (bf *BoundaryCondition) VerVelo(vol *volume.Volume) {
 	// 最左列の垂直流速は右列と同じ
 	leftmost := 0
 	for y := 0; y < vol.Height; y++ {
-		vol.Grid[y][leftmost] = vol.Grid[y][leftmost+1]
+		vol.Grid[y][leftmost] = -vol.Grid[y][leftmost+1]
 	}
 
 	// 最右列の垂直流速は左列と同じ
 	rightmost := vol.Width - 1
 	for y := 0; y < vol.Height; y++ {
-		vol.Grid[y][rightmost] = vol.Grid[y][rightmost-1]
+		vol.Grid[y][rightmost] = -vol.Grid[y][rightmost-1]
 	}
 
 	// 最下2段の垂直流速は0

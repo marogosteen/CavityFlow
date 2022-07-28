@@ -51,7 +51,7 @@ def reshape_2d(array: np.ndarray, omit: int = 1) -> np.ndarray:
     return new_array
 
 
-omit = 6
+omit = 2
 
 if not os.path.exists(OUTPUTDIR):
     os.mkdir(OUTPUTDIR)
@@ -73,12 +73,15 @@ for fp in files:
         np.linspace(0, 0.02, row),
         np.linspace(0, 0.02, col)
     )
-
     magnitude = np.hypot(u, v)
 
     fig, ax = plt.subplots(figsize=(14, 10))
     pcf = ax.contourf(x, y, p, alpha=0.3, cmap="jet", vmax=0.65, vmin=0.25)
-    # TODO 戻す
+    x = x[1:-1, 1:-1]
+    y = y[1:-1, 1:-1]
+    u = u[1:-1, 1:-1]
+    v = v[1:-1, 1:-1]
+    magnitude = magnitude[1:-1, 1:-1]
     qv = ax.quiver(
         x, y, u, v, magnitude, cmap="jet",
         scale_units="xy", scale=1

@@ -95,12 +95,24 @@ func (s *SimulationController) Phi(x int, y int) float64 {
 
 	pp1 += ((ru-u)/s.Dh + (ov-v)/s.Dh) / s.Dt
 
-	pp2 += ru*(r2u-u)/(2*s.Dh) + rv4*(oru-uru)/(2*s.Dh)
-	pp2 -= u*(ru-lu)/(2*s.Dh) + v4*(ou-uu)/(2*s.Dh)
+	pp2 += (ru + math.Abs(ru)) / 2 * (ru - u) / s.Dh
+	pp2 += (ru - math.Abs(ru)) / 2 * (r2u - ru) / s.Dh
+	pp2 += (rv4 + math.Abs(rv4)) / 2 * (ru - uru) / s.Dh
+	pp2 += (rv4 - math.Abs(rv4)) / 2 * (oru - ru) / s.Dh
+	pp2 -= (u + math.Abs(u)) / 2 * (u - lu) / s.Dh
+	pp2 -= (u - math.Abs(u)) / 2 * (ru - u) / s.Dh
+	pp2 -= (v4 + math.Abs(v4)) / 2 * (u - uu) / s.Dh
+	pp2 -= (v4 - math.Abs(v4)) / 2 * (ou - u) / s.Dh
 	pp2 *= -1 / s.Dh
 
-	pp3 += ou4*(orv-olv)/(2*s.Dh) + ov*(o2v-v)/(2*s.Dh)
-	pp3 -= u4*(rv-lv)/(2*s.Dh) + v*(ov-uv)/(2*s.Dh)
+	pp3 += (ou4 + math.Abs(ou4)) / 2 * (ov - olv) / s.Dh
+	pp3 += (ou4 - math.Abs(ou4)) / 2 * (orv - ov) / s.Dh
+	pp3 += (ov + math.Abs(ov)) / 2 * (ov - v) / s.Dh
+	pp3 += (ov - math.Abs(ov)) / 2 * (o2v - ov) / s.Dh
+	pp3 -= (u4 + math.Abs(u4)) / 2 * (v - lv) / s.Dh
+	pp3 -= (u4 - math.Abs(u4)) / 2 * (rv - v) / s.Dh
+	pp3 -= (v + math.Abs(v)) / 2 * (v - uv) / s.Dh
+	pp3 -= (v - math.Abs(v)) / 2 * (ov - v) / s.Dh
 	pp3 *= -1 / s.Dh
 
 	return rho * (pp1 + pp2 + pp3)

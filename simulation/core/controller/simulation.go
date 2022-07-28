@@ -104,8 +104,8 @@ func (s *SimulationController) SurroundingVerVelo(x int, y int) float64 {
 
 func (s *SimulationController) newPhi() [][]float64 {
 	var phi [][]float64
-	for y := 0; y < 66; y++ {
-		phi = append(phi, make([]float64, 252))
+	for y := 0; y < 65; y++ {
+		phi = append(phi, make([]float64, 65))
 	}
 	// TODO magic number これはNextPressとのつながりがあるはず．
 	for y := 1; y < 65; y++ {
